@@ -1,0 +1,111 @@
+public class Descompactador {
+
+  public String texto_compactado;
+  public String texto_descompactado;
+
+  public Descompactador(String texto_compactado) {
+    this.texto_compactado = texto_compactado;
+    this.texto_descompactado = "";
+  }
+
+  public void descompactar() {
+    StringBuilder textoDescompactadoBuilder = new StringBuilder();
+    int i = 0;
+    while (i < texto_compactado.length()) {
+      char letra = texto_compactado.charAt(i);
+      i++; // Avança para o '('
+
+      if (i < texto_compactado.length() && texto_compactado.charAt(i) == '(') {
+        i++; // Avança para o primeiro dígito da quantidade
+        int j = i;
+        while (j < texto_compactado.length() && Character.isDigit(texto_compactado.charAt(j))) {
+          j++;
+        }
+
+        if (j > i && j < texto_compactado.length() && texto_compactado.charAt(j) == ')') {
+          int quantidade = Integer.parseInt(texto_compactado.substring(i, j));
+          for (int k = 0; k < quantidade; k++) {
+            textoDescompactadoBuilder.append(letra);
+          }
+          i = j + 2; // Avança para o próximo caractere após ') ' (se houver)
+        } else {
+          // Formato inválido, lida com o erro ou adiciona a letra sozinha
+          textoDescompactadoBuilder.append(letra);
+          // Pode ser necessário avançar 'i' de forma diferente dependendo do tratamento
+          // de erro
+          if (j < texto_compactado.length()) {
+            i = j + 1;
+          } else {
+            break;
+          }
+        }
+      } else {
+        // Caso não encontre '(', adiciona a letra sozinha
+        textoDescompactadoBuilder.append(letra);
+        // Avança para o próximo caractere
+        i++;
+      }
+    }
+    this.texto_descompactado = textoDescompactadoBuilder.toString();
+  }
+
+  public String getTextoCompactado() {
+    return texto_compactado;
+  }
+
+  public String getTextoDescompactado() {
+    return texto_descompactado;
+  }
+}
+
+import java.util.HashMap;
+
+public class Compactador {
+  public String texto_inicial;
+  public String texto_final;
+  HashMap<Character, Integer> caracter_quantidade = new HashMap<Character, Integer>();
+
+  public Compactador(String texto) {
+    this.texto_inicial = texto;
+    this.caracter_quantidade = new HashMap<Character, Integer>();
+    this.texto_final = "";
+  }
+
+  public void compactar() {
+    // Passo 1: Contar a frequência de cada caractere
+    for (char c : texto_inicial.toCharArray()) {
+      caracter_quantidade.put(c, caracter_quantidade.getOrDefault(c, 0) + 1);
+    }
+
+    // Passo 2: Gerar o texto final compactado no novo formato
+    StringBuilder texto_final_builder = new StringBuilder();
+    for (HashMap.Entry<Character, Integer> entry : caracter_quantidade.entrySet()) {
+      texto_final_builder.append(entry.getKey())
+          .append("(")
+          .append(entry.getValue())
+          .append(") ");
+    }
+    this.texto_final = texto_final_builder.toString().trim(); // Remove o espaço extra no final
+
+    // Opcional: Imprimir as quantidades e o texto compactado no novo formato
+    System.out.println("Quantidade de Caracteres:");
+    for (HashMap.Entry<Character, Integer> entry : caracter_quantidade.entrySet()) {
+      System.out.println("'" + entry.getKey() + "' : " + entry.getValue());
+    }
+    System.out.println("\nTexto Inicial: " + texto_inicial);
+    System.out.println("Texto Compactado: " + texto_final);
+  }
+
+  public String getTextoInicial() {
+    return texto_inicial;
+  }
+
+  public String getTextoFinal() {
+    return texto_final;
+  }
+
+  public HashMap<Character, Integer> getCaracterQuantidade() {
+    return caracter_quantidade;
+  }
+
+}
